@@ -13,6 +13,7 @@ export default function AppLayout() {
           </NavLink>
           <NavLink to="/log">Log Hours</NavLink>
           <NavLink to="/organizations">Organizations</NavLink>
+          <NavLink to="/submit">Submit</NavLink>
           <NavLink to="/profile">Profile</NavLink>
         </nav>
         <button type="button" className="secondary small" onClick={() => signOut(auth)}>

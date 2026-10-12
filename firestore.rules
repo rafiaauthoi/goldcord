@@ -64,6 +64,18 @@ service cloud.firestore {
         && data.updatedAt == request.time;
     }
 
+    function isValidDraft(draftId, data) {
+      return data.keys().hasOnly(['year', 'orgId', 'description', 'impact', 'updatedAt'])
+        && data.keys().hasAll(['year', 'orgId', 'description', 'impact', 'updatedAt'])
+        && data.year is string
+        && data.year.matches('[0-9]{4}-[0-9]{4}')
+        && isRequiredString(data.orgId, 64)
+        && draftId == data.year + '_' + data.orgId
+        && isString(data.description, 3000)
+        && isString(data.impact, 3000)
+        && data.updatedAt == request.time;
+    }
+
     match /users/{uid} {
       allow get: if isOwner(uid);
       allow create, update: if isOwner(uid) && isValidProfile(request.resource.data);
@@ -87,6 +99,12 @@ service cloud.firestore {
         allow update: if isOwner(uid)
           && isValidSession(uid, request.resource.data)
           && request.resource.data.createdAt == resource.data.createdAt;
+        allow delete: if isOwner(uid);
+      }
+
+      match /drafts/{draftId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && isValidDraft(draftId, request.resource.data);
         allow delete: if isOwner(uid);
       }
     }

@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import App from "./App";
 import "./index.css";
 import "./tracker.css";
+import "./submit.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

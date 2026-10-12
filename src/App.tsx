@@ -8,6 +8,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
 import LogHours from "./pages/LogHours";
 import Organizations from "./pages/Organizations";
+import Submit from "./pages/Submit";
 import Profile from "./pages/Profile";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/log" element={<LogHours />} />
         <Route path="/organizations" element={<Organizations />} />
+        <Route path="/submit" element={<Submit />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
