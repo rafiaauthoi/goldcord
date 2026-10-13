@@ -128,6 +128,13 @@ Manual test results:
 - `.env.local` is ignored by git so forks can use their own Firebase project.
 - No server secrets exist in this repository.
 
+### Repository security
+
+- GitHub CodeQL code scanning runs on every push to `main`.
+- Dependabot alerts, Dependabot security updates, and malware alerts monitor every npm dependency.
+- Secret Protection and push protection block commits that contain recognized credentials.
+- Private vulnerability reporting is enabled so security issues can be reported without a public issue.
+
 ## Privacy and data collection
 
 ### What is collected
