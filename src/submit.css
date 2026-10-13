@@ -129,3 +129,42 @@
 .sentence-count.ok {
   color: var(--success);
 }
+
+.ai-polish {
+  display: grid;
+  gap: 10px;
+  margin-top: -6px;
+}
+
+.ai-polish-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ai-polish-row .hint {
+  flex: 1;
+  min-width: 200px;
+}
+
+.ai-suggestion {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+}
+
+.ai-suggestion-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.ai-suggestion-text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
