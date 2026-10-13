@@ -15,6 +15,7 @@ import {
 import type { Session } from "../lib/sessions";
 import { currentAcademicYear, daysUntilDeadline, deadlineYear } from "../lib/academicYear";
 import OrgTotals from "../components/OrgTotals";
+import Cord from "../components/Cord";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -47,7 +48,6 @@ export default function Dashboard() {
   const completed = totalHours(sessions);
   const toReview = flaggedHours(sessions);
   const met = completed >= required;
-  const percent = Math.min(100, Math.round((completed / required) * 100));
   const remaining = Math.max(0, required - completed);
   const daysLeft = daysUntilDeadline(academicYear);
   const deadline = `June 30, ${deadlineYear(academicYear)}`;
@@ -68,24 +68,15 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="panel">
+      <div className="dashboard-hero">
         <div className="progress-header">
-          <h2>Progress</h2>
+          <h2>{met ? "Your cord is complete" : "Your cord so far"}</h2>
           <span className="progress-count">
             <strong>{roundHours(completed)}</strong> of {required} hours
           </span>
         </div>
-        <div
-          className="progress"
-          role="progressbar"
-          aria-label="Service hours completed"
-          aria-valuemin={0}
-          aria-valuemax={required}
-          aria-valuenow={roundHours(completed)}
-        >
-          <div className={`progress-bar${met ? " complete" : ""}`} style={{ width: `${percent}%` }} />
-        </div>
-        <p className="muted">
+        <Cord value={completed} max={required} label="Service hours completed" />
+        <p className="progress-line">
           {met
             ? `Requirement met. Submit your LHC service log before ${deadline}.`
             : `${formatHours(remaining)} to go. ${daysLeft} ${daysLeft === 1 ? "day" : "days"} until ${deadline}.`}
@@ -96,8 +87,8 @@ export default function Dashboard() {
             over before you submit.
           </p>
         )}
-        <Link className="button" to="/log">
-          Log hours
+        <Link className="button" to={met ? "/submit" : "/log"}>
+          {met ? "Get ready to submit" : "Log hours"}
         </Link>
       </div>
 
