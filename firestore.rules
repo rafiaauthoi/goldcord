@@ -80,6 +80,7 @@ service cloud.firestore {
     match /users/{uid} {
       allow get: if isOwner(uid);
       allow create, update: if isOwner(uid) && isValidProfile(request.resource.data);
+      allow delete: if isOwner(uid);
 
       match /organizations/{orgId} {
         allow read: if isOwner(uid);

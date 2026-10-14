@@ -2,6 +2,8 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import BrandMark from "./BrandMark";
+import SiteFooter from "./SiteFooter";
+import StorageNotice from "./StorageNotice";
 
 export default function AppLayout() {
   return (
@@ -28,6 +30,8 @@ export default function AppLayout() {
       <main className="app-main">
         <Outlet />
       </main>
+      <SiteFooter />
+      <StorageNotice />
     </div>
   );
 }

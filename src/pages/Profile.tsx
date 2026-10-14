@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { emptyProfile, getProfile, saveProfile } from "../lib/profile";
 import type { Profile as ProfileData, Requirement } from "../lib/profile";
 import { currentAcademicYear } from "../lib/academicYear";
+import DeleteAccount from "../components/DeleteAccount";
 
 const SEMESTERS = ["Fall", "Spring"];
 
@@ -184,6 +185,7 @@ export default function Profile() {
           {saving ? "Saving..." : "Save profile"}
         </button>
       </form>
+      <DeleteAccount />
     </section>
   );
 }

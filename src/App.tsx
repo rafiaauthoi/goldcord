@@ -12,6 +12,7 @@ import Submit from "./pages/Submit";
 import Profile from "./pages/Profile";
 import Scrapbook from "./pages/Scrapbook";
 import YearInReview from "./pages/YearInReview";
+import { PrivacyPage, SecurityPage, TermsPage } from "./pages/Legal";
 
 export default function App() {
   return (
@@ -19,6 +20,9 @@ export default function App() {
       <Route path="/login" element={<GuestRoute><Landing key="signin" initialMode="signin" /></GuestRoute>} />
       <Route path="/signup" element={<GuestRoute><Landing key="signup" initialMode="signup" /></GuestRoute>} />
       <Route path="/verify" element={<VerifyEmail />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/security" element={<SecurityPage />} />
       <Route path="/" element={<HomeGate />}>
         <Route index element={<Dashboard />} />
       </Route>

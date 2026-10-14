@@ -11,6 +11,7 @@ import "./tracker.css";
 import "./submit.css";
 import "./landing.css";
 import "./scrapbook.css";
+import "./legal.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

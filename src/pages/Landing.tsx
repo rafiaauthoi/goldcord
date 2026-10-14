@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import type { ReactNode, RefObject } from "react";
 import AuthPanel from "../components/AuthPanel";
 import type { AuthMode } from "../components/AuthPanel";
@@ -6,8 +7,9 @@ import BrandMark from "../components/BrandMark";
 import Cord from "../components/Cord";
 import ScrapbookBits from "../components/ScrapbookBits";
 import ScrapbookPile from "../components/ScrapbookPile";
+import StorageNotice from "../components/StorageNotice";
 
-const REPO_URL = "https://github.com/rafiaauthoi/honors-hours";
+const REPO_URL = "https://github.com/rafiaauthoi/goldcord";
 
 const FAQS: { q: string; a: ReactNode }[] = [
   {
@@ -304,6 +306,9 @@ export default function Landing({ initialMode = "signup" }: { initialMode?: Auth
             <a href={`${REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer">
               MIT License
             </a>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/security">Security</Link>
           </nav>
           <div className="lp-footer-about">
             <p>Built by Rafia Authoi, an honors student at Western Michigan University.</p>
@@ -321,6 +326,7 @@ export default function Landing({ initialMode = "signup" }: { initialMode?: Auth
           </a>
         </div>
       </footer>
+      <StorageNotice />
     </div>
   );
 }
