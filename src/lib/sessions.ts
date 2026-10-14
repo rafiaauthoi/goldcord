@@ -24,6 +24,7 @@ export type SessionInput = {
 
 export type Session = SessionInput & {
   id: string;
+  favorite?: boolean;
 };
 
 export type OrganizationTotal = {
@@ -54,6 +55,7 @@ export async function listSessionsForYear(uid: string, academicYear: string): Pr
       hours: Number(data.hours ?? 0),
       activity: data.activity ?? "",
       flags: (data.flags ?? []) as FlagKey[],
+      favorite: data.favorite === true,
     };
   });
   return sortSessions(sessions);
@@ -71,6 +73,13 @@ export async function createSession(uid: string, input: SessionInput) {
 export async function updateSession(uid: string, id: string, input: SessionInput) {
   await updateDoc(doc(db, "users", uid, "sessions", id), {
     ...input,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function setSessionFavorite(uid: string, id: string, favorite: boolean) {
+  await updateDoc(doc(db, "users", uid, "sessions", id), {
+    favorite,
     updatedAt: serverTimestamp(),
   });
 }

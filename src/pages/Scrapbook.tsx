@@ -5,7 +5,7 @@ import { getProfile } from "../lib/profile";
 import type { Profile } from "../lib/profile";
 import { listOrganizations } from "../lib/organizations";
 import type { Organization } from "../lib/organizations";
-import { formatHours, listSessionsForYear, roundHours, totalHours } from "../lib/sessions";
+import { formatHours, listSessionsForYear, roundHours, setSessionFavorite, totalHours } from "../lib/sessions";
 import type { Session } from "../lib/sessions";
 import {
   currentAcademicYear,
@@ -13,16 +13,8 @@ import {
   deadlineYear,
   recentAcademicYears,
 } from "../lib/academicYear";
+import { ORG_COLORS, reviewUnlocked, shortDate, unlockDateLabel } from "../lib/review";
 import Cord from "../components/Cord";
-
-const ORG_COLORS = [
-  "var(--danger)",
-  "var(--ink)",
-  "var(--success)",
-  "var(--gold-text)",
-  "var(--ink-hover)",
-  "var(--ink-soft)",
-];
 
 type MonthGroup = {
   key: string;
@@ -55,11 +47,6 @@ function groupByMonth(sessions: Session[]): MonthGroup[] {
   });
 }
 
-function shortDate(dateString: string) {
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
 export default function Scrapbook() {
   const { user } = useAuth();
   const [year, setYear] = useState(currentAcademicYear());
@@ -90,6 +77,21 @@ export default function Scrapbook() {
     };
   }, [user, year]);
 
+  async function toggleFavorite(session: Session) {
+    if (!user) return;
+    const next = !session.favorite;
+    setError("");
+    setSessions((current) => current.map((item) => (item.id === session.id ? { ...item, favorite: next } : item)));
+    try {
+      await setSessionFavorite(user.uid, session.id, next);
+    } catch {
+      setSessions((current) =>
+        current.map((item) => (item.id === session.id ? { ...item, favorite: !next } : item)),
+      );
+      setError("Could not save that star. Try again.");
+    }
+  }
+
   function changeYear(value: string) {
     setLoading(true);
     setError("");
@@ -106,6 +108,7 @@ export default function Scrapbook() {
   const orgCount = new Set(sessions.map((session) => session.orgId)).size;
   const isCurrent = year === currentAcademicYear();
   const daysLeft = daysUntilDeadline(year);
+  const unlocked = reviewUnlocked(year, completed, required);
 
   return (
     <section className="page scrapbook">
@@ -150,6 +153,22 @@ export default function Scrapbook() {
             </p>
           </div>
 
+          {sessions.length > 0 &&
+            (unlocked ? (
+              <Link className="scrapbook-review is-open" to={`/scrapbook/review?year=${year}`}>
+                <span className="scrapbook-review-title">Your year in review is ready</span>
+                <span>See where your hours went, your favorite moments, and prompts for the LHC form.</span>
+              </Link>
+            ) : (
+              <div className="scrapbook-review">
+                <span className="scrapbook-review-title">Year in review</span>
+                <span>
+                  Opens at {required} hours or on {unlockDateLabel(year)}. Star your favorite cards along the
+                  way and they will show up there.
+                </span>
+              </div>
+            ))}
+
           {months.length === 0 ? (
             <div className="scrapbook-empty">
               <p className="scrapbook-empty-title">Nothing pinned yet.</p>
@@ -186,6 +205,17 @@ export default function Scrapbook() {
                             <span className="scrap-hours num">{formatHours(session.hours)}</span>
                             {session.flags.length > 0 && <span className="scrap-flag">Check before submitting</span>}
                           </Link>
+                          <button
+                            type="button"
+                            className={`scrap-star${session.favorite ? " is-on" : ""}`}
+                            aria-pressed={Boolean(session.favorite)}
+                            aria-label={`Favorite moment: ${name}, ${shortDate(session.date)}`}
+                            onClick={() => toggleFavorite(session)}
+                          >
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                              <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" />
+                            </svg>
+                          </button>
                         </li>
                       );
                     })}

@@ -50,7 +50,7 @@ service cloud.firestore {
     }
 
     function isValidSession(uid, data) {
-      return data.keys().hasOnly(['orgId', 'date', 'hours', 'activity', 'flags', 'createdAt', 'updatedAt'])
+      return data.keys().hasOnly(['orgId', 'date', 'hours', 'activity', 'flags', 'favorite', 'createdAt', 'updatedAt'])
         && data.keys().hasAll(['orgId', 'date', 'hours', 'activity', 'flags', 'createdAt', 'updatedAt'])
         && isRequiredString(data.orgId, 64)
         && exists(/databases/$(database)/documents/users/$(uid)/organizations/$(data.orgId))
@@ -61,6 +61,7 @@ service cloud.firestore {
         && data.hours <= 24
         && isRequiredString(data.activity, 500)
         && isValidFlags(data.flags)
+        && (!('favorite' in data) || data.favorite is bool)
         && data.updatedAt == request.time;
     }
 

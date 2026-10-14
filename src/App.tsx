@@ -11,6 +11,7 @@ import Organizations from "./pages/Organizations";
 import Submit from "./pages/Submit";
 import Profile from "./pages/Profile";
 import Scrapbook from "./pages/Scrapbook";
+import YearInReview from "./pages/YearInReview";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/log" element={<LogHours />} />
         <Route path="/scrapbook" element={<Scrapbook />} />
+        <Route path="/scrapbook/review" element={<YearInReview />} />
         <Route path="/organizations" element={<Organizations />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/profile" element={<Profile />} />
