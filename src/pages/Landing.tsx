@@ -8,6 +8,7 @@ import Cord from "../components/Cord";
 import ScrapbookBits from "../components/ScrapbookBits";
 import ScrapbookPile from "../components/ScrapbookPile";
 import StorageNotice from "../components/StorageNotice";
+import { AUTH_EMAIL_SENDER } from "../lib/authEmail";
 
 const REPO_URL = "https://github.com/rafiaauthoi/goldcord";
 
@@ -31,6 +32,10 @@ const FAQS: { q: string; a: ReactNode }[] = [
   {
     q: "Who can see my hours?",
     a: "Only you. Accounts need a verified @wmich.edu email, and the database rules only let you read and write your own records.",
+  },
+  {
+    q: "Why do my sign-in emails say honors-hours?",
+    a: `GoldCord started out as Honors Hours, and Firebase keeps a project's original name forever. Verification and password reset emails come from ${AUTH_EMAIL_SENDER}, and that address is legit. Emails about your account from anywhere else are not from GoldCord.`,
   },
   {
     q: "How does the writing help work?",

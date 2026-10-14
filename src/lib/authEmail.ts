@@ -1,0 +1,1 @@
+export const AUTH_EMAIL_SENDER = "noreply@honors-hours.firebaseapp.com";

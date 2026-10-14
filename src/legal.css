@@ -197,3 +197,10 @@
     align-items: flex-start;
   }
 }
+
+.sender-note {
+  margin: -8px 0 18px;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}

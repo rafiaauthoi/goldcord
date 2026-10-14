@@ -5,6 +5,7 @@ import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/aut
 import { FirebaseError } from "firebase/app";
 import { auth } from "../lib/firebase";
 import { authErrorMessage } from "../lib/authErrors";
+import { AUTH_EMAIL_SENDER } from "../lib/authEmail";
 import PasswordInput from "./PasswordInput";
 
 export default function LoginForm() {
@@ -46,7 +47,7 @@ export default function LoginForm() {
         return;
       }
     }
-    setNotice("If an account exists for that email, a reset link is on its way.");
+    setNotice(`If an account exists for that email, a reset link is on its way from ${AUTH_EMAIL_SENDER}.`);
   }
 
   return (

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import BrandMark from "../components/BrandMark";
 import SiteFooter from "../components/SiteFooter";
+import { AUTH_EMAIL_SENDER } from "../lib/authEmail";
 
 const UPDATED = "October 14, 2026";
 const REPO_URL = "https://github.com/rafiaauthoi/goldcord";
@@ -250,6 +251,11 @@ export function SecurityPage() {
         </li>
         <li>Sign-in errors do not reveal whether an email has an account.</li>
         <li>Deleting your account asks for your password again before anything is removed.</li>
+        <li>
+          Verification and password reset emails only come from <strong>{AUTH_EMAIL_SENDER}</strong>,
+          named after GoldCord's original project name, and their links go to honors-hours.firebaseapp.com.
+          Ignore emails about your GoldCord account from any other address.
+        </li>
       </ul>
 
       <h2>Your records</h2>

@@ -4,6 +4,7 @@ import { sendEmailVerification, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import { authErrorMessage } from "../lib/authErrors";
+import { AUTH_EMAIL_SENDER } from "../lib/authEmail";
 
 export default function VerifyEmail() {
   const { user, emailVerified, loading, refreshUser } = useAuth();
@@ -39,7 +40,7 @@ export default function VerifyEmail() {
     setBusy(true);
     try {
       await sendEmailVerification(current);
-      setNotice("Verification email sent. Check your inbox and junk folder.");
+      setNotice(`Verification email sent from ${AUTH_EMAIL_SENDER}. Check your inbox and junk folder.`);
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {
@@ -53,6 +54,10 @@ export default function VerifyEmail() {
         <h1>Verify your email</h1>
         <p className="subtitle">
           We sent a link to <strong>{user.email}</strong>. Click it, then come back here.
+        </p>
+        <p className="sender-note">
+          It comes from <strong>{AUTH_EMAIL_SENDER}</strong>. honors-hours was GoldCord's original name, so
+          that address is legit. Check your junk folder if you do not see it.
         </p>
         <div className="stack">
           <button type="button" onClick={handleCheck} disabled={busy}>
