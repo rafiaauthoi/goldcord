@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -11,9 +11,9 @@ import { auth } from "../lib/firebase";
 import { isWmuEmail } from "../lib/wmu";
 import { authErrorMessage } from "../lib/authErrors";
 import { passwordChecks } from "../lib/passwordPolicy";
-import PasswordInput from "../components/PasswordInput";
+import PasswordInput from "./PasswordInput";
 
-export default function Signup() {
+export default function SignupForm() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,57 +79,44 @@ export default function Signup() {
   const checks = status ? passwordChecks(status) : [];
 
   return (
-    <div className="center">
-      <div className="card">
-        <h1>Create your account</h1>
-        <p className="subtitle">Track your Lee Honors College service hours.</p>
-        <form onSubmit={handleSubmit}>
-          <label>
-            WMU email
-            <input
-              type="email"
-              autoComplete="email"
-              placeholder="you@wmich.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Password
-            <PasswordInput
-              value={password}
-              onChange={handlePasswordChange}
-              autoComplete="new-password"
-            />
-          </label>
-          {checks.length > 0 && (
-            <ul className="requirements" aria-label="Password requirements">
-              {checks.map((check) => (
-                <li key={check.label} className={check.met ? "met" : ""}>
-                  <span className="sr-only">{check.met ? "Done: " : "Missing: "}</span>
-                  {check.label}
-                </li>
-              ))}
-            </ul>
-          )}
-          <label>
-            Confirm password
-            <PasswordInput
-              value={confirm}
-              onChange={setConfirm}
-              autoComplete="new-password"
-            />
-          </label>
-          {error && <p className="error">{error}</p>}
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Creating account..." : "Sign up"}
-          </button>
-        </form>
-        <p className="footer-text">
-          Already have an account? <Link to="/login">Log in</Link>
-        </p>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        WMU email
+        <input
+          id="auth-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@wmich.edu"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Password
+        <PasswordInput value={password} onChange={handlePasswordChange} autoComplete="new-password" />
+      </label>
+      {checks.length > 0 && password.length > 0 && (
+        <ul className="requirements" aria-label="Password requirements">
+          {checks.map((check) => (
+            <li key={check.label} className={check.met ? "met" : ""}>
+              <span className="sr-only">{check.met ? "Done: " : "Missing: "}</span>
+              {check.label}
+            </li>
+          ))}
+        </ul>
+      )}
+      <label>
+        Confirm password
+        <PasswordInput value={confirm} onChange={setConfirm} autoComplete="new-password" />
+      </label>
+      {error && <p className="error">{error}</p>}
+      <button type="submit" disabled={submitting}>
+        {submitting ? "Creating account..." : "Create account"}
+      </button>
+      <p className="auth-fine">
+        Only @wmich.edu addresses. We send one email to confirm it is yours.
+      </p>
+    </form>
   );
 }

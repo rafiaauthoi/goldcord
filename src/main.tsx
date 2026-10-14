@@ -9,6 +9,7 @@ import "@fontsource-variable/source-sans-3/index.css";
 import "./index.css";
 import "./tracker.css";
 import "./submit.css";
+import "./landing.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
