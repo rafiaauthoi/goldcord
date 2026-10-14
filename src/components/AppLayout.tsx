@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
@@ -28,7 +29,9 @@ export default function AppLayout() {
         </button>
       </header>
       <main className="app-main">
-        <Outlet />
+        <Suspense fallback={<p className="muted">Loading...</p>}>
+          <Outlet />
+        </Suspense>
       </main>
       <SiteFooter />
       <StorageNotice />

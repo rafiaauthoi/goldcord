@@ -7,7 +7,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { db } from "./db";
 
 export type OrganizationInput = {
   name: string;

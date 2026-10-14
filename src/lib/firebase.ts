@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 
 declare global {
   interface Window {
@@ -30,4 +29,3 @@ export const appCheck = initializeAppCheck(app, {
 });
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);

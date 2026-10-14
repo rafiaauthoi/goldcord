@@ -1,7 +1,7 @@
 import { collection, deleteDoc, doc, getDocs, writeBatch } from "firebase/firestore";
 import { EmailAuthProvider, deleteUser, reauthenticateWithCredential } from "firebase/auth";
 import type { User } from "firebase/auth";
-import { db } from "./firebase";
+import { db } from "./db";
 
 const SUBCOLLECTIONS = ["sessions", "drafts", "organizations"];
 const BATCH_LIMIT = 400;

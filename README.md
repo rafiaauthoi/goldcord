@@ -327,7 +327,7 @@ The app deploys to Vercel as a static Vite site. Add the same seven environment 
 - [x] Scrapbook, starred favorites, and year in review
 - [ ] Enforce App Check for Cloud Firestore after monitoring production traffic
 - [ ] Automated Security Rules tests with the Firebase Emulator Suite
-- [ ] Code splitting to reduce the initial bundle size
+- [x] Code splitting to reduce the initial bundle size
 
 ## Reporting a security issue
 
