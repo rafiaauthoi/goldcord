@@ -10,6 +10,7 @@ import LogHours from "./pages/LogHours";
 import Organizations from "./pages/Organizations";
 import Submit from "./pages/Submit";
 import Profile from "./pages/Profile";
+import Scrapbook from "./pages/Scrapbook";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
       </Route>
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route path="/log" element={<LogHours />} />
+        <Route path="/scrapbook" element={<Scrapbook />} />
         <Route path="/organizations" element={<Organizations />} />
         <Route path="/submit" element={<Submit />} />
         <Route path="/profile" element={<Profile />} />

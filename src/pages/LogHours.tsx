@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { listOrganizations } from "../lib/organizations";
 import type { Organization } from "../lib/organizations";
@@ -40,7 +40,11 @@ export default function LogHours() {
   const { user } = useAuth();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [year, setYear] = useState(currentAcademicYear());
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [year, setYear] = useState(() => {
+    const requested = searchParams.get("year");
+    return requested && /^\d{4}-\d{4}$/.test(requested) ? requested : currentAcademicYear();
+  });
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
@@ -75,6 +79,14 @@ export default function LogHours() {
       cancelled = true;
     };
   }, [user, year]);
+
+  useEffect(() => {
+    const editId = searchParams.get("edit");
+    if (!editId || loadingSessions) return;
+    const target = sessions.find((session) => session.id === editId);
+    if (target) startEdit(target);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, sessions, loadingSessions]);
 
   const orgNames = new Map(organizations.map((organization) => [organization.id, organization.name]));
 
