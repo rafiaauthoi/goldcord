@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /log
+Disallow: /scrapbook
+Disallow: /organizations
+Disallow: /submit
+Disallow: /profile
+Disallow: /verify
+
+Sitemap: https://goldcord-app.vercel.app/sitemap.xml

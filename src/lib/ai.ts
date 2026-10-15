@@ -1,6 +1,6 @@
 import { getAI, getGenerativeModel, GoogleAIBackend, ThinkingLevel } from "firebase/ai";
 import type { GenerativeModel } from "firebase/ai";
-import { app } from "./firebase";
+import { app, startAppCheck } from "./firebase";
 
 export type PolishKind = "description" | "impact";
 
@@ -45,6 +45,7 @@ const INSTRUCTIONS: Record<PolishKind, string> = {
   ].join(" "),
 };
 
+startAppCheck();
 const ai = getAI(app, { backend: new GoogleAIBackend() });
 
 function createModel(kind: PolishKind, choice: ModelChoice): GenerativeModel {

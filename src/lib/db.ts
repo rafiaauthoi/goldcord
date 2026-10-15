@@ -1,4 +1,6 @@
 import { getFirestore } from "firebase/firestore";
-import { app } from "./firebase";
+import { app, startAppCheck } from "./firebase";
+
+startAppCheck();
 
 export const db = getFirestore(app);

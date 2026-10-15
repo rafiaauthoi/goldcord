@@ -261,9 +261,21 @@ export default function Landing({ initialMode = "signup" }: { initialMode?: Auth
         <div className="lp-braid" aria-hidden="true" />
 
         <section className="lp-faq" id="faq" aria-labelledby="faq-title">
-          <h2 id="faq-title" className="lp-section-title" data-reveal>
-            FAQs
-          </h2>
+          <div className="lp-faq-side">
+            <h2 id="faq-title" className="lp-section-title" data-reveal>
+              FAQs
+            </h2>
+            <p className="lp-faq-sub" data-reveal>
+              Quick answers about hours, deadlines, privacy, and how GoldCord works.
+            </p>
+            <p className="lp-faq-note" data-reveal>
+              Still stuck? Ask an LHC advisor about the rules, or{" "}
+              <a href={`${REPO_URL}/issues`} target="_blank" rel="noreferrer">
+                open an issue on GitHub
+              </a>{" "}
+              about the app.
+            </p>
+          </div>
           <div className="lp-faq-list">
             {FAQS.map((item, index) => (
               <details key={item.q} name="faq" className="lp-tile" data-reveal open={index === 0}>

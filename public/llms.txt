@@ -1,0 +1,16 @@
+# GoldCord
+
+> GoldCord is a free, open-source volunteer hours tracker for Western Michigan University Lee Honors College students. It is an independent student project and is not affiliated with WMU or the Lee Honors College.
+
+Students log service sessions, track progress toward the yearly 20 hour requirement (10 in some cases), review the year in a scrapbook, and copy every field of the LHC Community Service Log in form order. Accounts require a verified @wmich.edu email, and each student's records are private to their account.
+
+## Pages
+
+- [Home](https://goldcord-app.vercel.app/): what GoldCord does, an interactive demo, and FAQs
+- [Privacy](https://goldcord-app.vercel.app/privacy): what is stored, who processes it, and how to delete it
+- [Terms](https://goldcord-app.vercel.app/terms): terms of use
+- [Security](https://goldcord-app.vercel.app/security): how accounts and data are protected
+
+## Source
+
+- [GitHub repository](https://github.com/rafiaauthoi/goldcord): source code under the MIT License

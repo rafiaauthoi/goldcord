@@ -18,14 +18,35 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 
-if (import.meta.env.DEV) {
-  window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+let appCheckStarted = false;
+
+export function startAppCheck() {
+  if (appCheckStarted) return;
+  appCheckStarted = true;
+  if (import.meta.env.DEV) {
+    window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
 }
 
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-  isTokenAutoRefreshEnabled: true,
-});
+const INTERACTION_EVENTS = ["pointerdown", "keydown", "focusin", "touchstart", "scroll"];
+const FALLBACK_DELAY_MS = 4000;
 
-export const auth = getAuth(app);
+export function startAppCheckAfterFirstPaint() {
+  const start = () => {
+    INTERACTION_EVENTS.forEach((name) => window.removeEventListener(name, start, true));
+    startAppCheck();
+  };
+  INTERACTION_EVENTS.forEach((name) => window.addEventListener(name, start, { capture: true, passive: true }));
+  const startLater = () => setTimeout(start, FALLBACK_DELAY_MS);
+  if (document.readyState === "complete") {
+    startLater();
+  } else {
+    window.addEventListener("load", startLater, { once: true });
+  }
+}

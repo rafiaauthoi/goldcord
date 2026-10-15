@@ -1273,3 +1273,59 @@
     font-size: 17vw;
   }
 }
+
+.lp-faq-side {
+  position: sticky;
+  top: 48px;
+  align-self: start;
+  display: grid;
+  gap: 14px;
+}
+
+.lp-faq-sub {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.lp-faq-note {
+  position: relative;
+  justify-self: start;
+  max-width: 250px;
+  margin: 28px 0 0 6px;
+  padding: 24px 20px 20px;
+  background: #eadba8;
+  rotate: -2deg;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.lp-faq-note::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 64px;
+  height: 18px;
+  margin-left: -32px;
+  background: rgba(255, 253, 248, 0.75);
+  rotate: 3deg;
+}
+
+.lp-faq-note a {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+
+@media (max-width: 1000px) {
+  .lp-faq-side {
+    position: static;
+  }
+
+  .lp-faq-note {
+    margin-top: 12px;
+  }
+}
