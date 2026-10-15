@@ -51,6 +51,32 @@ export default function Dashboard() {
   const remaining = Math.max(0, required - completed);
   const daysLeft = daysUntilDeadline(academicYear);
   const deadline = `June 30, ${deadlineYear(academicYear)}`;
+  const steps = [
+    {
+      title: "Fill in your profile",
+      detail: "Your name and requirement fill in the top of the LHC form.",
+      action: "Set up profile",
+      to: "/profile",
+      done: profile !== null,
+    },
+    {
+      title: "Add an organization",
+      detail: "Save each place you volunteer, with its contact details.",
+      action: "Add organization",
+      to: "/organizations",
+      done: organizations.length > 0,
+    },
+    {
+      title: "Log your first shift",
+      detail: "Record the date, hours, and a few notes while you remember them.",
+      action: "Log hours",
+      to: "/log",
+      done: sessions.length > 0,
+    },
+  ];
+  const doneCount = steps.filter((step) => step.done).length;
+  const setupDone = doneCount === steps.length;
+  const nextStep = steps.find((step) => !step.done);
 
   return (
     <section className="page">
@@ -58,14 +84,38 @@ export default function Dashboard() {
       <p className="subtitle">Academic year {academicYear}, July 1 to June 30</p>
       {error && <p className="error">{error}</p>}
 
-      {!profile && !error && (
-        <div className="panel">
-          <h2>Finish setting up</h2>
-          <p>Add your name and honors college details. They fill in the LHC service log later.</p>
-          <Link className="button" to="/profile">
-            Set up profile
-          </Link>
-        </div>
+      {!error && !setupDone && (
+        <section className="panel setup" aria-labelledby="setup-title">
+          <div className="setup-head">
+            <h2 id="setup-title">Get started</h2>
+            <span className="setup-count">
+              {doneCount} of {steps.length} done
+            </span>
+          </div>
+          <p className="setup-intro">Three quick steps and your cord starts filling up.</p>
+          <ol className="setup-list">
+            {steps.map((step) => {
+              const isNext = step === nextStep;
+              return (
+                <li key={step.to} className={`setup-step${step.done ? " is-done" : ""}${isNext ? " is-next" : ""}`}>
+                  <span className="setup-mark" aria-hidden="true" />
+                  <span className="setup-text">
+                    <span className="setup-title">
+                      {step.title}
+                      <span className="sr-only">{step.done ? ", done" : ", not done yet"}</span>
+                    </span>
+                    <span className="setup-detail">{step.detail}</span>
+                  </span>
+                  {!step.done && (
+                    <Link className={isNext ? "button small" : "button secondary small"} to={step.to}>
+                      {step.action}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
       )}
 
       <div className="dashboard-hero">
