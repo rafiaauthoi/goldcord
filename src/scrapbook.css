@@ -542,3 +542,7 @@
     transition: none;
   }
 }
+
+.scrap-flag {
+  margin-right: 30px;
+}
