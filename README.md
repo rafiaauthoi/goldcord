@@ -16,6 +16,7 @@ A secure volunteer hours tracker for Western Michigan University Lee Honors Coll
 - [Architecture](#architecture)
 - [Design](#design)
 - [Security](#security)
+- [Performance and hardening](#performance-and-hardening)
 - [Privacy and data collection](#privacy-and-data-collection)
 - [Cookies and browser storage](#cookies-and-browser-storage)
 - [Terms of use](#terms-of-use)
@@ -144,8 +145,9 @@ Browser-side checks are for usability. The rules in [`firestore.rules`](firestor
 ### App Check
 
 - App Check verifies that requests come from this app on a legitimate device, using Google Cloud Fraud Defense (formerly reCAPTCHA Enterprise) as the attestation provider.
-- App Check is enforced for Firebase AI Logic, so the AI quota cannot be used by scripts or copied configurations.
-- Local development uses an App Check debug token. The debug flag is behind `import.meta.env.DEV`, so Vite removes it from production builds entirely. Debug tokens are never committed.
+- App Check is enforced for both Cloud Firestore and Firebase AI Logic, so scripts and copied configurations cannot read or write data or use the AI quota, even with a valid account.
+- Enforcement was turned on only after monitoring production traffic: every request from the live site was verified, with zero unknown-origin or outdated-client requests.
+- Local development uses an App Check debug token. The debug flag is behind `import.meta.env.DEV`, so Vite removes it from production builds entirely. Debug tokens are never committed. Because Firestore is enforced, local development only reaches the database once the browser's debug token is registered.
 - Setup note: reCAPTCHA v3 was the original plan, but classic reCAPTCHA keys are deprecated for App Check registration, so the app uses Fraud Defense, which Firebase now recommends.
 
 ### AI safety
@@ -188,6 +190,40 @@ Manual test results:
 - Dependabot alerts, Dependabot security updates, and malware alerts monitor every npm dependency.
 - Secret Protection and push protection block commits that contain recognized credentials.
 - Private vulnerability reporting is enabled so security issues can be reported without a public issue.
+
+## Performance and hardening
+
+A friend ran the site through [PageSpeed Insights](https://pagespeed.web.dev/) and mobile performance scored 50. These changes brought it up without changing the design or any animation:
+
+| | Before | After |
+|---|---|---|
+| Mobile performance | 50 | 94 |
+| Desktop performance | 74 | 100 |
+| Accessibility | 100 | 100 |
+| Desktop best practices | 96 | 100 |
+| SEO | 91 | 100 |
+
+### What changed
+
+- **Route-level code splitting.** Every page except the landing page loads on demand with `React.lazy`, and Firestore moved into its own module so visitors who never sign in never download it. The first load dropped from 962 KB to 420 KB (290 KB to 130 KB over the network).
+- **App Check after first paint.** reCAPTCHA used to load before the page could draw. It now starts on the first interaction, or a few seconds after load, and the database and AI modules start it themselves before their first request, so every protected request still carries a token.
+- **No unused auth helper.** Firebase Auth is initialized with `initializeAuth` and local persistence only. The default `getAuth` also loads Google's popup and redirect sign-in iframe, which GoldCord never uses, so skipping it saves a script, a frame, and a CSP exception.
+- **Long-lived caching** for fingerprinted assets (`Cache-Control: public, max-age=31536000, immutable`).
+- **robots.txt, sitemap.xml, and llms.txt** served as real files, so crawlers stop receiving the app's HTML in their place.
+
+### Security headers
+
+Set in [`vercel.json`](vercel.json) for every route:
+
+| Header | Purpose |
+|---|---|
+| `Content-Security-Policy` | Scripts, frames, and connections are limited to the site itself, reCAPTCHA, and Google APIs. No inline scripts, no plugins, no framing. Rolled out in report-only mode first and enforced once the console was clean. |
+| `X-Frame-Options: DENY` | Blocks clickjacking by refusing to load inside another site's frame |
+| `Strict-Transport-Security` | Browsers always use HTTPS |
+| `X-Content-Type-Options: nosniff` | Stops the browser from guessing file types |
+| `Referrer-Policy: strict-origin-when-cross-origin` | Full URLs are not leaked to other sites |
+| `Permissions-Policy` | Camera, microphone, location, payment, and USB are switched off |
+| `Cross-Origin-Opener-Policy: same-origin` | Other windows cannot reach into this one |
 
 ## Privacy and data collection
 
@@ -276,7 +312,7 @@ You can run your own copy with a free Firebase project.
 2. **Firestore:** create a Standard edition database in production mode, then publish the contents of `firestore.rules` in the Rules tab.
 3. **Web app:** register a web app and copy its config values.
 4. **AI Logic:** open AI services > AI Logic, click Get started, and choose the Gemini Developer API.
-5. **Fraud Defense:** in Google Cloud, create a Website key for your production domain (do not add localhost). Register it in Firebase App Check for your web app, then enforce App Check for Firebase AI Logic with baseline protection.
+5. **Fraud Defense:** in Google Cloud, create a Website key for your production domain (do not add localhost). Register it in Firebase App Check for your web app, then enforce App Check for Firebase AI Logic with baseline protection. Watch the Cloud Firestore metrics for a few days of real traffic, and enforce it there too once nearly every request is verified.
 
 If the Fraud Defense console will not save a domain change, the same update works from Cloud Shell:
 
@@ -316,7 +352,7 @@ Open the browser console, copy the `AppCheck debug token`, and add it in Firebas
 
 ### Deploy
 
-The app deploys to Vercel as a static Vite site. Add the same seven environment variables in Vercel, add your production domain to Firebase Authentication's authorized domains, and make sure the domain is listed on your Fraud Defense key. `vercel.json` rewrites all routes to `index.html` so client-side routes survive a refresh.
+The app deploys to Vercel as a static Vite site. Add the same seven environment variables in Vercel, add your production domain to Firebase Authentication's authorized domains, and make sure the domain is listed on your Fraud Defense key. `vercel.json` rewrites all routes to `index.html` so client-side routes survive a refresh, and also sets the security headers.
 
 ## Roadmap
 
@@ -325,9 +361,10 @@ The app deploys to Vercel as a static Vite site. Add the same seven environment 
 - [x] Rename to GoldCord and visual redesign
 - [x] Interactive landing page
 - [x] Scrapbook, starred favorites, and year in review
-- [ ] Enforce App Check for Cloud Firestore after monitoring production traffic
+- [x] Enforce App Check for Cloud Firestore after monitoring production traffic
+- [x] Code splitting, security headers, and an enforced Content Security Policy
+- [x] Getting-started checklist on the Dashboard
 - [ ] Automated Security Rules tests with the Firebase Emulator Suite
-- [x] Code splitting to reduce the initial bundle size
 
 ## Reporting a security issue
 

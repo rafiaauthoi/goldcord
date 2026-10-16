@@ -5,7 +5,7 @@ import BrandMark from "../components/BrandMark";
 import SiteFooter from "../components/SiteFooter";
 import { AUTH_EMAIL_SENDER } from "../lib/authEmail";
 
-const UPDATED = "October 14, 2026";
+const UPDATED = "October 16, 2026";
 const REPO_URL = "https://github.com/rafiaauthoi/goldcord";
 const REPORT_URL = `${REPO_URL}/security/advisories/new`;
 
@@ -271,7 +271,21 @@ export function SecurityPage() {
       <h2>Bots and abuse</h2>
       <ul>
         <li>Firebase App Check with reCAPTCHA confirms requests come from the real GoldCord site.</li>
-        <li>The AI writing helper only accepts requests that pass App Check.</li>
+        <li>
+          The database and the AI writing helper both reject any request that does not pass App Check, so
+          scripts cannot reach your data even with a valid account.
+        </li>
+      </ul>
+
+      <h2>The site itself</h2>
+      <ul>
+        <li>
+          A strict Content Security Policy only allows scripts from GoldCord and Google reCAPTCHA, which
+          blocks injected scripts from running.
+        </li>
+        <li>The site cannot be framed by other sites, which prevents clickjacking.</li>
+        <li>Browsers are told to always use HTTPS.</li>
+        <li>Camera, microphone, location, and payment features are switched off.</li>
       </ul>
 
       <h2>The AI writing helper</h2>
