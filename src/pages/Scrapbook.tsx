@@ -15,6 +15,9 @@ import {
 } from "../lib/academicYear";
 import { ORG_COLORS, reviewUnlocked, shortDate, unlockDateLabel } from "../lib/review";
 import Cord from "../components/Cord";
+import LetterNote from "../components/LetterNote";
+
+const READ_MORE_LENGTH = 90;
 
 type MonthGroup = {
   key: string;
@@ -55,6 +58,7 @@ export default function Scrapbook() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -109,6 +113,7 @@ export default function Scrapbook() {
   const isCurrent = year === currentAcademicYear();
   const daysLeft = daysUntilDeadline(year);
   const unlocked = reviewUnlocked(year, completed, required);
+  const openSession = sessions.find((session) => session.id === openId) ?? null;
 
   return (
     <section className="page scrapbook">
@@ -191,10 +196,12 @@ export default function Scrapbook() {
                       const name = orgName.get(session.orgId) ?? "Organization removed";
                       return (
                         <li key={session.id} style={{ rotate: `${tilt(session.id)}deg` }}>
-                          <Link
+                          <button
+                            type="button"
                             className="scrap-card"
-                            to={`/log?edit=${session.id}&year=${year}`}
-                            aria-label={`${name}, ${shortDate(session.date)}, ${formatHours(session.hours)}. Open to edit.`}
+                            aria-haspopup="dialog"
+                            aria-label={`${name}, ${shortDate(session.date)}, ${formatHours(session.hours)}. Open the full note.`}
+                            onClick={() => setOpenId(session.id)}
                           >
                             <span className="scrap-tape" aria-hidden="true" />
                             <span className="scrap-photo" style={{ background: ORG_COLORS[index % ORG_COLORS.length] }}>
@@ -202,9 +209,14 @@ export default function Scrapbook() {
                             </span>
                             <span className="scrap-date">{shortDate(session.date)}</span>
                             <span className="scrap-activity">{session.activity || "No notes yet"}</span>
+                            {session.activity.length > READ_MORE_LENGTH && (
+                              <span className="scrap-more" aria-hidden="true">
+                                Read more
+                              </span>
+                            )}
                             <span className="scrap-hours num">{formatHours(session.hours)}</span>
                             {session.flags.length > 0 && <span className="scrap-flag">Check before submitting</span>}
-                          </Link>
+                          </button>
                           <button
                             type="button"
                             className={`scrap-star${session.favorite ? " is-on" : ""}`}
@@ -226,6 +238,14 @@ export default function Scrapbook() {
           )}
         </>
       )}
+
+      <LetterNote
+        session={openSession}
+        organizationName={openSession ? orgName.get(openSession.orgId) ?? "Organization removed" : ""}
+        color={openSession ? ORG_COLORS[(orgIndex.get(openSession.orgId) ?? 0) % ORG_COLORS.length] : "var(--ink)"}
+        year={year}
+        onClose={() => setOpenId(null)}
+      />
     </section>
   );
 }
