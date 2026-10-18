@@ -14,7 +14,7 @@ A secure volunteer hours tracker for Western Michigan University Lee Honors Coll
 - [Features](#features)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
-- [Design](#design)
+- [Design and inspiration](#design-and-inspiration)
 - [Security](#security)
 - [Performance and hardening](#performance-and-hardening)
 - [Privacy and data collection](#privacy-and-data-collection)
@@ -46,11 +46,12 @@ In practice, that means reconstructing months of volunteering from memory in Jun
 
 ### Scrapbook and year in review
 
-- **Scrapbook.** Every session becomes a taped card on a month page, color-coded by organization. Pick any of the last four academic years. Click a card to open that session for editing.
+- **Scrapbook.** Every session becomes a taped card on a month page, color-coded by organization. Pick any of the last four academic years. Card previews stop at three lines with a Read more hint.
+- **Letters.** Click a card and it opens as a letter: an envelope in the organization's color, a flap that folds back, and lined paper with the full note, date, hours, and an Edit this shift link.
 - **Starred favorites.** Star any card to mark it as a favorite moment. Stars are saved to the session (`favorite: true`) and validated by the security rules as a boolean.
-- **Year in review.** A summary page with hours, shifts, organizations, and your busiest month. Each organization gets an envelope that fans out its most recent cards when you open it. Reflection prompts at the end lead into the Submit page.
+- **Year in review.** A summary page with hours, shifts, organizations, and your busiest month. Each organization gets an envelope that fans out its most recent cards when you open it, and a Show more button on the envelope unfolds a crumpled note with every shift and its full notes. Reflection prompts at the end lead into the Submit page.
 - **Unlock rule.** The current year's review opens when you reach your required hours or on May 1 of the deadline year, whichever comes first, so there is something to look back on before the June 30 deadline. Past years are always open.
-- **Favorite moments fallback.** The review shows your starred cards (up to six). If nothing is starred, it shows the three sessions with the longest notes and suggests starring cards in the scrapbook.
+- **Favorite moments.** The review shows your starred cards (up to six) as taped notes that preview five lines. Click one to unfold the full moment. If nothing is starred, it shows the three sessions with the longest notes and suggests starring cards in the scrapbook.
 
 ### Submitting
 
@@ -101,19 +102,49 @@ The scrapbook and year in review read the same sessions as the dashboard. Nothin
 src/
   pages/        Landing, Dashboard, LogHours, Organizations, Submit, Profile,
                 Scrapbook, YearInReview, Legal (Privacy, Terms, Security), VerifyEmail
-  components/   Cord, ScrapbookPile, ScrapbookBits, AiPolish, CopyField, DeleteAccount,
-                SiteFooter, StorageNotice, auth forms and route guards
+  components/   Cord, ScrapbookPile, ScrapbookBits, LetterNote, CrumpledNote, AiPolish,
+                CopyField, DeleteAccount, SiteFooter, StorageNotice, auth forms and route guards
   lib/          Firebase setup, Firestore helpers, academic year math, review logic,
                 AI prompts, account deletion, password policy
 ```
 
-## Design
+## Design and inspiration
 
-GoldCord is named after the gold honor cord LHC graduates wear. The visual system leans into that: warm paper backgrounds, deep ink text, and gold accents, set in Fraunces (display) and Source Sans 3 (text).
+### Where the idea came from
+
+I keep a cork board in my room. Anything I want to remember for a long time gets pinned there: a page, a ticket, a sticky note. After a volunteer shift, I usually add a quick note like "volunteered at X for Y hours doing Z" so at least something from that day sticks around. That board is basically a scrapbook, and GoldCord is built the same way.
+
+Volunteering is a pile of small moments, not rows in a spreadsheet, so every shift is treated as a keepsake.
+
+### The visual system
+
+GoldCord is named after the gold honor cord LHC graduates wear. Warm paper backgrounds, deep ink text, and gold accents, set in Fraunces (display) and Source Sans 3 (text).
 
 - **The cord** is the progress bar everywhere: a braided gold strand that fills from left to right and ends in a tassel.
 - **Scrapbook details** on the landing page (washi tape, stamps, sticky notes, a pinned cork board) use a muted palette so the sample cards stay the focus.
-- **Accessibility:** visible focus outlines, `aria` labels on every interactive card, a screen-reader list behind each review envelope, keyboard-operable star buttons, and reduced-motion fallbacks.
+
+### Paper, used three ways
+
+Each paper metaphor matches what you are doing, so they never compete:
+
+| Moment | Metaphor | Why |
+|---|---|---|
+| Browsing the year | Taped cards on a month page | Quick to scan, like the cork board |
+| Reading one shift | A letter slipping out of an envelope in the organization's color, on lined paper | A single shift, written down and sent to your future self |
+| Looking back | A crumpled note that tumbles in and smooths flat, leaving faint creases | A note you saved and unfold again later |
+
+### Restraint
+
+- Every animation, from the board sway to the letter flap and the crumpled note, has a `prefers-reduced-motion` fallback.
+- Long notes never break a layout. Previews stop at three lines on scrapbook and envelope cards and five on favorite moments, and the full text is always one click away.
+
+### Accessibility
+
+- **No nested buttons.** Show more is its own button on the envelope, not one tucked inside the envelope's button, which keyboards and screen readers cannot handle reliably.
+- **Labels that match what you see.** Screen readers hear "Show more from Hawkins Middle School AV Club," and because the label starts with the visible words, voice control users can still say "click Show more."
+- **Native dialogs.** Letters and crumpled notes use `<dialog>` with `showModal()`, so focus stays inside, Escape closes them, and focus returns to where you were.
+- **Contrast and focus.** Ink on tan and paper passes WCAG AA, and every interactive element has a visible focus outline.
+- **Hidden context.** A screen-reader list behind each review envelope reads out its shifts, and star buttons work from the keyboard.
 
 ## Security
 
@@ -352,7 +383,7 @@ Open the browser console, copy the `AppCheck debug token`, and add it in Firebas
 
 ### Deploy
 
-The app deploys to Vercel as a static Vite site. Add the same seven environment variables in Vercel, add your production domain to Firebase Authentication's authorized domains, and make sure the domain is listed on your Fraud Defense key. `vercel.json` rewrites all routes to `index.html` so client-side routes survive a refresh, and also sets the security headers.
+The app deploys to Vercel as a static Vite site. Add the same seven environment variables in Vercel, add your production domain to Firebase Authentication's authorized domains, and make sure the domain is listed on your Fraud Defense key. `vercel.json` rewrites all routes to `index.html` so client-side routes survive a refresh.
 
 ## Roadmap
 
@@ -364,6 +395,7 @@ The app deploys to Vercel as a static Vite site. Add the same seven environment 
 - [x] Enforce App Check for Cloud Firestore after monitoring production traffic
 - [x] Code splitting, security headers, and an enforced Content Security Policy
 - [x] Getting-started checklist on the Dashboard
+- [x] Letter view in the scrapbook and crumpled notes in the year in review
 - [ ] Automated Security Rules tests with the Firebase Emulator Suite
 
 ## Reporting a security issue

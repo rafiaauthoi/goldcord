@@ -20,12 +20,20 @@ import {
   unlockDateLabel,
 } from "../lib/review";
 import Cord from "../components/Cord";
+import CrumpledNote from "../components/CrumpledNote";
+import type { CrumpledNoteContent } from "../components/CrumpledNote";
 
 const PROMPTS = [
   "Which shift stuck with you, and why?",
   "What did you learn about your community this year?",
   "What would you do differently next year?",
 ];
+
+const MOMENT_PREVIEW_LENGTH = 140;
+
+function shiftCount(count: number) {
+  return `${count} ${count === 1 ? "shift" : "shifts"}`;
+}
 
 export default function YearInReview() {
   const { user } = useAuth();
@@ -36,6 +44,7 @@ export default function YearInReview() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [open, setOpen] = useState<string | null>(null);
+  const [note, setNote] = useState<CrumpledNoteContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -185,10 +194,23 @@ export default function YearInReview() {
                 <span className="review-pocket">
                   <span className="review-pocket-name">{name}</span>
                   <span>
-                    {formatHours(group.hours)} · {group.sessions.length}{" "}
-                    {group.sessions.length === 1 ? "shift" : "shifts"}
+                    {formatHours(group.hours)} · {shiftCount(group.sessions.length)}
                   </span>
                 </span>
+              </button>
+              <button
+                type="button"
+                className="review-more"
+                aria-label={`Show more from ${name}`}
+                onClick={() =>
+                  setNote({
+                    title: name,
+                    kicker: `${formatHours(group.hours)} · ${shiftCount(group.sessions.length)}`,
+                    sessions: group.sessions,
+                  })
+                }
+              >
+                Show more
               </button>
               <ul className="sr-only">
                 {group.sessions.map((session) => (
@@ -211,10 +233,25 @@ export default function YearInReview() {
           <ul className="review-moments">
             {moments.picked.map((session) => (
               <li key={session.id}>
-                <blockquote>{session.activity}</blockquote>
-                <p>
-                  {orgName.get(session.orgId) ?? "Organization removed"} · {shortDate(session.date)}
-                </p>
+                <button
+                  type="button"
+                  className="review-moment"
+                  onClick={() =>
+                    setNote({
+                      title: orgName.get(session.orgId) ?? "Organization removed",
+                      kicker: `${shortDate(session.date)} · ${formatHours(session.hours)}`,
+                      sessions: [session],
+                    })
+                  }
+                >
+                  <span className="review-moment-text">{session.activity}</span>
+                  <span className="review-moment-meta">
+                    {orgName.get(session.orgId) ?? "Organization removed"} · {shortDate(session.date)}
+                  </span>
+                  {session.activity.length > MOMENT_PREVIEW_LENGTH && (
+                    <span className="review-moment-more">Show more</span>
+                  )}
+                </button>
               </li>
             ))}
           </ul>
@@ -233,6 +270,8 @@ export default function YearInReview() {
           Get ready to submit
         </Link>
       </div>
+
+      <CrumpledNote note={note} onClose={() => setNote(null)} />
     </section>
   );
 }
