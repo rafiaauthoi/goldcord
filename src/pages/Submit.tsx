@@ -121,7 +121,7 @@ export default function Submit() {
         <label className="inline-select">
           Academic year
           <select value={year} onChange={(e) => changeYear(e.target.value)}>
-            {recentAcademicYears(4).map((option) => (
+            {recentAcademicYears(6).map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -171,6 +171,9 @@ export default function Submit() {
               value={profile ? `${profile.firstName} ${profile.lastName}` : ""}
             />
             <CopyField label="Preferred Name" value={profile?.preferredName ?? ""} />
+                        <p className="field-note">
+              Want a different name here? <Link to="/profile">Edit it in your profile</Link>.
+            </p>
             <ManualField
               label="WIN (Western Identification Number)"
               note="Type your nine-digit WIN directly into the LHC form. This app never stores it."

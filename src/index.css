@@ -591,3 +591,23 @@ a:hover {
     animation-duration: 0.01ms !important;
   }
 }
+.bonus-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  color: var(--gold-text);
+}
+
+.bonus-star {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: var(--gold);
+}
+
+.field-note {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}

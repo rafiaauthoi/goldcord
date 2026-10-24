@@ -15,6 +15,7 @@ import {
 } from "../lib/academicYear";
 import { ORG_COLORS, reviewUnlocked, shortDate, unlockDateLabel } from "../lib/review";
 import Cord from "../components/Cord";
+import BonusHours from "../components/BonusHours";
 import LetterNote from "../components/LetterNote";
 
 const READ_MORE_LENGTH = 90;
@@ -125,7 +126,7 @@ export default function Scrapbook() {
         <label className="scrapbook-year">
           Academic year
           <select value={year} onChange={(event) => changeYear(event.target.value)}>
-            {recentAcademicYears(4).map((option) => (
+            {recentAcademicYears(6).map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -149,6 +150,7 @@ export default function Scrapbook() {
               </span>
             </p>
             <Cord value={completed} max={required} label={`Service hours for ${year}`} />
+                          <BonusHours completed={completed} required={required} />
             <p className="scrapbook-line">
               {met
                 ? "Your cord is complete for this year."

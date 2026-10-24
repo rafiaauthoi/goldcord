@@ -16,6 +16,7 @@ import type { Session } from "../lib/sessions";
 import { currentAcademicYear, daysUntilDeadline, deadlineYear } from "../lib/academicYear";
 import OrgTotals from "../components/OrgTotals";
 import Cord from "../components/Cord";
+import BonusHours from "../components/BonusHours";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -126,6 +127,7 @@ export default function Dashboard() {
           </span>
         </div>
         <Cord value={completed} max={required} label="Service hours completed" />
+                  <BonusHours completed={completed} required={required} />
         <p className="progress-line">
           {met
             ? `Requirement met. Submit your LHC service log before ${deadline}.`

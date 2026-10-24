@@ -21,6 +21,7 @@ import {
 } from "../lib/review";
 import Cord from "../components/Cord";
 import CrumpledNote from "../components/CrumpledNote";
+import { bonusHours } from "../components/BonusHours";
 import type { CrumpledNoteContent } from "../components/CrumpledNote";
 
 const PROMPTS = [
@@ -74,6 +75,7 @@ export default function YearInReview() {
   const required = profile?.requirements[year] ?? 20;
   const completed = totalHours(sessions);
   const met = completed >= required;
+  const bonus = bonusHours(completed, required);
   const unlocked = reviewUnlocked(year, completed, required);
   const orgIndex = new Map(organizations.map((organization, index) => [organization.id, index]));
   const orgName = new Map(organizations.map((organization) => [organization.id, organization.name]));
@@ -132,7 +134,7 @@ export default function YearInReview() {
       <h1>Your {year}, in review</h1>
       <p className="subtitle">
         {met
-          ? `${formatHours(completed)}, ${groups.length} ${groups.length === 1 ? "place" : "places"}, one finished cord.`
+          ? `${formatHours(completed)}${bonus > 0 ? ` (${formatHours(bonus)} bonus)` : ""}, ${groups.length} ${groups.length === 1 ? "place" : "places"}, one finished cord.`
           : `${formatHours(completed)} across ${groups.length} ${groups.length === 1 ? "place" : "places"} so far.`}
       </p>
 

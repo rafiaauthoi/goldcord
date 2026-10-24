@@ -367,7 +367,7 @@ export default function LogHours() {
         <label className="inline-select">
           Academic year
           <select value={year} onChange={(e) => changeYear(e.target.value)}>
-            {recentAcademicYears(4).map((option) => (
+            {recentAcademicYears(6).map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
