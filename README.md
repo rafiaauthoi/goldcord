@@ -4,6 +4,8 @@ A secure volunteer hours tracker for Western Michigan University Lee Honors Coll
 
 **Live app:** [goldcord-app.vercel.app](https://goldcord-app.vercel.app)
 
+[![Security Rules tests](https://github.com/rafiaauthoi/goldcord/actions/workflows/rules-tests.yml/badge.svg)](https://github.com/rafiaauthoi/goldcord/actions/workflows/rules-tests.yml)
+
 > **Independent student project.** GoldCord is not affiliated with, endorsed by, or operated by Western Michigan University or the Lee Honors College. It does not submit anything to the LHC. Students still submit their hours through the official LHC Community Service Log, and the honors college makes all approval decisions.
 
 ---
@@ -106,6 +108,7 @@ src/
                 CopyField, DeleteAccount, SiteFooter, StorageNotice, auth forms and route guards
   lib/          Firebase setup, Firestore helpers, academic year math, review logic,
                 AI prompts, account deletion, password policy
+tests/          Firestore Security Rules tests (Firebase Emulator Suite)
 ```
 
 ## Design and inspiration
@@ -168,10 +171,28 @@ Browser-side checks are for usability. The rules in [`firestore.rules`](firestor
 - Every document type has strict schema validation: required fields, no unexpected fields, type checks, and size limits on every string.
 - `createdAt` and `updatedAt` must equal the server's request time, so timestamps cannot be backdated.
 - Sessions can only reference an organization that exists in the same user's account, checked server-side with `exists()`.
-- Hours are limited to 0 through 24 per session, and eligibility flags must come from a fixed list.
+- Hours must be more than 0 and at most 24 per session, and eligibility flags must come from a fixed list.
 - The optional `favorite` field on a session must be a boolean if it is present.
 - Draft document IDs must match the year and organization stored inside them.
 - Owners can delete their own profile document and subcollections, which is what in-app account deletion uses. Nobody else can.
+
+### Security Rules tests
+
+The rules are tested against the Firebase Emulator Suite, so every claim in the section above is checked by code instead of trusted. The suite lives in [`tests/firestore.rules.test.mjs`](tests/firestore.rules.test.mjs) and uses `@firebase/rules-unit-testing` with Node's built-in test runner. It runs against an offline `demo-goldcord` project, so it never touches production data.
+
+| Area | What the tests prove |
+|---|---|
+| Cross-user access | Another user cannot read, list, write, or delete your profile, organizations, sessions, or drafts, and nobody can list the `users` collection |
+| Who can sign in | Signed-out visitors, unverified `@wmich.edu` accounts, other domains, and look-alikes such as `wmich.edu.attacker.example` are rejected. Uppercase `@WMICH.EDU` still works |
+| Schema | Unknown fields, missing fields, strings one character over the limit, hours of 0 or above 24, malformed dates, unknown flags, and mismatched draft IDs are rejected. Values exactly at each limit pass |
+| Timestamps | Backdated `createdAt` and `updatedAt` values are rejected, and `createdAt` cannot be changed after creation |
+| Organization ownership | A session cannot point at an organization that does not exist or that belongs to another user |
+| Favorites | `favorite` can be toggled as a boolean, and strings or numbers are rejected |
+| Account deletion | Owners can delete their own sessions, organizations, drafts, and profile |
+
+**Result: 24 tests in 7 suites, 24 passing.** The tests run in GitHub Actions on every push and pull request, and the badge at the top of this README shows the latest result.
+
+The red `PERMISSION_DENIED` lines in the test output are expected. They are the rules blocking each attack attempt, which is what the tests check for.
 
 ### App Check
 
@@ -218,6 +239,7 @@ Manual test results:
 ### Repository security
 
 - GitHub CodeQL code scanning runs on every push to `main`.
+- Security Rules tests run in GitHub Actions on every push and pull request.
 - Dependabot alerts, Dependabot security updates, and malware alerts monitor every npm dependency.
 - Secret Protection and push protection block commits that contain recognized credentials.
 - Private vulnerability reporting is enabled so security issues can be reported without a public issue.
@@ -336,6 +358,7 @@ You can run your own copy with a free Firebase project.
 - Node.js 20.19 or later (or 22.12 or later)
 - A Firebase project on the free Spark plan
 - A Google Cloud Fraud Defense key (in the same project)
+- Java 21 or later, only for running the Security Rules tests
 
 ### Firebase setup
 
@@ -381,6 +404,14 @@ npm run dev
 
 Open the browser console, copy the `AppCheck debug token`, and add it in Firebase under App Check > Apps > Manage debug tokens. Keep that token private.
 
+Run the Security Rules tests:
+
+```bash
+npm test
+```
+
+The first run downloads the Firestore emulator. No Firebase login is needed.
+
 ### Deploy
 
 The app deploys to Vercel as a static Vite site. Add the same seven environment variables in Vercel, add your production domain to Firebase Authentication's authorized domains, and make sure the domain is listed on your Fraud Defense key. `vercel.json` rewrites all routes to `index.html` so client-side routes survive a refresh.
@@ -396,7 +427,7 @@ The app deploys to Vercel as a static Vite site. Add the same seven environment 
 - [x] Code splitting, security headers, and an enforced Content Security Policy
 - [x] Getting-started checklist on the Dashboard
 - [x] Letter view in the scrapbook and crumpled notes in the year in review
-- [ ] Automated Security Rules tests with the Firebase Emulator Suite
+- [x] Automated Security Rules tests with the Firebase Emulator Suite
 
 ## Reporting a security issue
 
